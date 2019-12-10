@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sustech.iot.mapper.LedStateMapper" >
+
+    <select id="getLedState" resultType="sustech.iot.dto.LedState">
+        select * from led_state where id=0
+    </select>
+
+    <update id="modifyLedState" parameterType="sustech.iot.dto.LedState">
+        update led_state set state=#{state} where id=0
+    </update>
+
+</mapper>

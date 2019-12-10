@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sustech.iot.mapper.RecordMapper" >
+
+    <select id="getRecords" resultType="sustech.iot.dto.Record">
+        select * from brightness_record order by time desc
+    </select>
+
+    <insert id="addRecord" parameterType="sustech.iot.dto.Record">
+        insert into brightness_record(brightness) values(#{brightness})
+    </insert>
+
+</mapper>
