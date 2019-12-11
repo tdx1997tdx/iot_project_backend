@@ -3,11 +3,11 @@
 <mapper namespace="sustech.iot.mapper.ModeMapper" >
 
     <select id="getModeState" resultType="Integer">
-        select * from led_mode
+        select mode from led_mode where id=0
     </select>
 
     <update id="modifyModeState" parameterType="Integer">
-        update led_mode set mode=#{i}
+        update led_mode set mode=#{i} where id=0
     </update>
 
 </mapper>
