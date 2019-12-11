@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sustech.iot.mapper.ModeMapper" >
+
+    <select id="getModeState" resultType="Integer">
+        select * from led_mode
+    </select>
+
+    <update id="modifyModeState" parameterType="Integer">
+        update led_mode set mode=#{i}
+    </update>
+
+</mapper>
