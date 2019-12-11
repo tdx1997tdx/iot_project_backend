@@ -135,17 +135,17 @@ public class MqttConfig {
                     System.out.println("灯光信息: "+message.getPayload().toString());
                     boolean isOk=recordMapper.addRecord(new Record(Integer.parseInt(message.getPayload().toString())));
                     if(isOk){
-                        mqttGateway.sendToMqtt("light",String.valueOf(1));
+                        System.out.println("增加灯光信息成功");
                     }else{
-                        mqttGateway.sendToMqtt("light",String.valueOf(0));
+                        System.out.println("增加灯光信息失败");
                     }
                 }else if("ledh".equalsIgnoreCase(topic)){
                     boolean isOk=ledStateMapper.modifyLedState(new LedState(Integer.parseInt(message.getPayload().toString())));
                     System.out.println("led灯的暗灭信息: "+message.getPayload().toString());
                     if(isOk){
-                        mqttGateway.sendToMqtt("ledh",String.valueOf(1));
+                        System.out.println("led灯修改成功");
                     }else{
-                        mqttGateway.sendToMqtt("ledh",String.valueOf(0));
+                        System.out.println("led灯修改失败");
                     }
                 }else if("mode".equalsIgnoreCase(topic)){
                     System.out.println("收到指令变更: "+message.getPayload().toString());
