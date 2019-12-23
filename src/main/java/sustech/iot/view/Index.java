@@ -15,4 +15,9 @@ public class Index {
     public String led(){
         return "led";
     }
+
+    @RequestMapping("/chart.html")
+    public String chart(){
+        return "chart";
+    }
 }

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7/css/bootstrap.css">
+    <script src="./lib/axios.min.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/highcharts.js"></script>
+    <script src="https://code.highcharts.com.cn/highcharts/modules/exporting.js"></script>
+    <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <nav class="navbar navbar-default">
+            <a href="index.html">灯光状态监控</a>
+            <a href="led.html">led状态控制</a>
+            <a href="chart.html">灯光状态监控图</a>
+        </nav>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">灯光状态监控图</h3>
+            </div>
+        </div>
+        <div id="container" style="min-width:400px;height:400px"></div>
+    </div>
+
+    <script type="text/javascript">
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        function activeLastPointToolip(chart) {
+            var points = chart.series[0].points;
+            chart.tooltip.refresh(points[points.length - 1]);
+        }
+
+
+
+        var option = {
+            chart: {
+                type: 'spline',
+                marginRight: 10,
+                events: {
+                    load: function() {
+                        var series = this.series[0],
+                            chart = this;
+                        activeLastPointToolip(chart);
+                        var value = 0;
+                        setInterval(async function() {
+                            var is_add = 0
+                            var x = 0,
+                                y = 0;
+                            await axios.post('/record/get_record', {
+                                    page: 1,
+                                    volume: 1
+                                })
+                                .then(response => {
+                                    var dat = response.data["data"][0]
+                                    if (dat["id"] != value) {
+                                        value = dat["id"]
+                                        var ctime = (new Date(dat["time"])).getTime()
+                                        x = ctime
+                                        y = dat["brightness"]
+                                        is_add = 1
+                                    }
+                                })
+                                .catch(function(error) {
+                                    console.log(error);
+                                });
+                            if (is_add == 1) {
+                                series.addPoint([x, y], true, true);
+                                activeLastPointToolip(chart);
+                                console.log("添加成功")
+                            }
+                        }, 1000);
+                    }
+                }
+            },
+            title: {
+                text: '动态模拟实时数据'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                title: {
+                    text: null
+                }
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) + '<br/>' +
+                        Highcharts.numberFormat(this.y, 2);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            series: [{
+                name: '灯光信息'
+            }]
+        }
+
+
+        async function init_data() {
+            await axios.post('/record/get_record', {
+                    page: 1,
+                    volume: 20
+                })
+                .then(response => {
+                    var series = [];
+                    var dat = response.data["data"]
+                    var ctime = (new Date()).getTime()
+                    for (var i = 0; i < dat.length - 1; i++) {
+                        series.push({
+                                x: (new Date(dat[i]["time"])).getTime(),
+                                y: parseInt(dat[i]["brightness"])
+                            }
+
+                        );
+                    }
+                    option.series[0].data = series;
+                    var chart = Highcharts.chart('container', option);
+
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        }
+
+        init_data()
+    </script>
+</body>
+
+</html>
