@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="./lib/bootstrap-3.3.7/css/bootstrap.css">
+    <script src="./lib/axios.min.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <nav class="navbar navbar-default">
+            <a href="index.html">灯光状态监控</a>
+            <a href="led.html">led状态控制</a>
+        </nav>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">led状态控制</h3>
+            </div>
+            <div class="panel-body">
+                <label>
+                    灯状态:
+                </label> {{led_state}}
+            </div>
+            <div class="panel-body">
+                <label>
+                    修改灯状态:
+                </label>
+                <select v-model="web_led_state">
+                    <option>开</option>
+                    <option>关</option>
+                </select>
+                <input type="button" value="修改灯状态" class="btn btn-primary" @click=modifyLed>
+            </div>
+            <div class="panel-body">
+                <label>
+                    当前模式:
+                </label> {{mode}}
+            </div>
+            <div class="panel-body">
+                <label>
+                    修改模式:
+                </label>
+                <select v-model="web_mode">
+                    <option>手动模式</option>
+                    <option>自动模式</option>
+                </select>
+                <input type="button" value="修改模式" class="btn btn-primary" @click=modifyMode>
+            </div>
+            {{msg}} <br>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                led_state: "关",
+                mode: "手动模式",
+                web_led_state: "",
+                web_mode: "",
+                msg: ""
+            },
+            methods: {
+                async modifyLed() {
+                    if (this.mode == "自动模式") {
+                        this.msg = "模式为自动模式，无法修改"
+                        return;
+                    }
+                    if (this.web_led_state == "开") {
+                        s = 1
+                    } else {
+                        s = 0
+                    }
+                    await axios.post('/led/modify_state', {
+                            state: s
+                        })
+                        .then(response => {
+                            var ret_state = response.data["state"]
+                            if (ret_state == 1) {
+                                this.led_state = this.web_led_state
+                            }
+                            this.msg = response.data["message"]
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                    console.log(this.led_state);
+                },
+                async modifyMode(keyword) {
+                    if (this.web_mode == "手动模式") {
+                        s = 1
+                    } else {
+                        s = 2
+                    }
+                    await axios.post('/mode/modify_mode', {
+                            state: s
+                        })
+                        .then(response => {
+                            var ret_state = response.data["state"]
+                            if (ret_state == 1) {
+                                this.mode = this.web_mode
+                            }
+                            this.msg = response.data["message"]
+                        })
+                        .catch(function(error) {
+                            console.log(error);
+                        });
+                    console.log(this.mode);
+                }
+
+            },
+            async created() {
+                await axios.get('/led/get_state')
+                    .then(response => {
+                        var state = response.data["state"]
+                        if (state == 0) {
+                            this.led_state = "关"
+                        } else {
+                            this.led_state = "开"
+                        }
+                        console.log(this.led_state);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+
+                await axios.get('/mode/get_mode')
+                    .then(response => {
+                        var mode = response.data["state"]
+                        if (mode == 1) {
+                            this.mode = "手动模式"
+                        } else {
+                            this.mode = "自动模式"
+                        }
+                        console.log(this.mode);
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            }
+        })
+    </script>
+</body>
+
+</html>

@@ -9,6 +9,7 @@ import sustech.iot.service.LedStateService;
 import sustech.iot.service.RecordService;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,9 @@ public class RecordControler {
         int page=Integer.parseInt(jsonParam.getString("page"));
         int volume=Integer.parseInt(jsonParam.getString("volume"));
         List<Record> records=recordService.getRecordService(page,volume);
-        return JSON.toJSONString(records);
+        Map<String,List> m=new HashMap<>();
+        m.put("data",records);
+        return JSON.toJSONString(m);
     }
 
     /**
