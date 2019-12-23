@@ -34,24 +34,13 @@
                 <tr v-for="(item,i) in list" :key="item.id">
                     <th>{{item.id}}</th>
                     <th>{{item.brightness}}</th>
-                    <th>{{item.time | Format}}</th>
+                    <th>{{item.time}}</th>
                 </tr>
             </tbody>
         </table>
     </div>
 
     <script type="text/javascript">
-        Vue.filter("Format", function(ctime) {
-            var date = new Date(ctime)
-            var x = date.getFullYear()
-            var y = date.getMonth().toString().padStart(2, "0")
-            var z = date.getDay().toString().padStart(2, "0")
-            var a = date.getHours().toString().padStart(2, "0")
-            var b = date.getMinutes().toString().padStart(2, "0")
-            var c = date.getSeconds().toString().padStart(2, "0")
-            return x + "-" + y + "-" + z + " " + a + ":" + b + ":" + c
-        })
-
         var vm = new Vue({
             el: '#app',
             data: {
@@ -62,7 +51,7 @@
                 refresh() {
                     axios.post('/record/get_record', {
                             page: 1,
-                            volume: 30
+                            volume: 10
                         })
                         .then(response => {
                             this.list = response.data["data"]
@@ -71,13 +60,14 @@
                         .catch(function(error) {
                             console.log(error);
                         });
+                },
+                test() {
+                    console.log("test")
                 }
             },
             created() {
                 this.refresh()
-                this.timer = setInterval(() => {
-                    this.refresh();
-                }, 1000);
+                this.timer = setInterval(this.refresh(), 1000)
 
             },
             breforDestroy() {
